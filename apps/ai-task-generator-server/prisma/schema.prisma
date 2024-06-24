@@ -1,0 +1,69 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Task {
+  aiAnalyses  AiAnalysis[]
+  createdAt   DateTime          @default(now())
+  description String?
+  dueDate     DateTime?
+  id          String            @id @default(cuid())
+  priority    EnumTaskPriority?
+  status      EnumTaskStatus?
+  title       String?
+  updatedAt   DateTime          @updatedAt
+}
+
+model AiAnalysis {
+  createdAt DateTime                 @default(now())
+  emails    Email[]
+  id        String                   @id @default(cuid())
+  keyTasks  Json?
+  sentiment EnumAiAnalysisSentiment?
+  summary   String?
+  task      Task?                    @relation(fields: [taskId], references: [id])
+  taskId    String?
+  updatedAt DateTime                 @updatedAt
+}
+
+model Email {
+  aiAnalysis   AiAnalysis? @relation(fields: [aiAnalysisId], references: [id])
+  aiAnalysisId String?
+  body         String?
+  createdAt    DateTime    @default(now())
+  id           String      @id @default(cuid())
+  recipient    String?
+  sender       String?
+  sentDate     DateTime?
+  subject      String?
+  updatedAt    DateTime    @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumTaskPriority {
+  Option1
+}
+
+enum EnumTaskStatus {
+  Option1
+}
+
+enum EnumAiAnalysisSentiment {
+  Option1
+}
